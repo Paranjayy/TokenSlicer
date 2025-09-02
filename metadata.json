@@ -1,0 +1,5 @@
+{
+  "name": "TokenSlicer",
+  "description": "A versatile toolkit for content processing. Features a token-aware Slicer for chunking long text for LLMs, and a powerful Extractor to pull structured data and transcripts from YouTube, Reddit, and article URLs.",
+  "requestFramePermissions": []
+}
