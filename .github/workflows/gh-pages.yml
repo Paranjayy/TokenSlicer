@@ -1,11 +1,8 @@
-name: Deploy Web to GitHub Pages
+name: Deploy TokenSlicer to GitHub Pages
 
 on:
   push:
     branches: [ main ]
-    paths:
-      - 'web/**'
-      - '.github/workflows/gh-pages.yml'
   workflow_dispatch:
 
 permissions:
@@ -14,7 +11,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: 'pages'
+  group: pages
   cancel-in-progress: true
 
 jobs:
@@ -27,16 +24,16 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: npm
       - name: Install
-        working-directory: web
         run: npm ci
       - name: Build
-        working-directory: web
         run: npm run build
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: web/dist
+          # We build to docs/ via Vite outDir
+          path: docs
 
   deploy:
     needs: build
