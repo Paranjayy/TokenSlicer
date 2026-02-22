@@ -4,12 +4,20 @@ import Sidebar from './components/Sidebar';
 import InputPanel from './components/InputPanel';
 import OutputPanel from './components/OutputPanel';
 import ExtractorPanel from './components/ExtractorPanel';
+import Toast from './components/Toast';
 import useLocalStorage from './hooks/useLocalStorage';
+import { useToast } from './hooks/useToast';
+import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { SplitSettings, TemplateSettings, OutputChunk, ModelPreset, TemplatePreset, HistoryItem, SplitUnit, Boundary } from './types';
 import { MODEL_PRESETS, DEFAULT_PRESET_ID, TEMPLATE_PRESETS } from './constants';
 import { countTokens, splitText } from './services/mockApi';
 import { ChevronLeftIcon } from './components/icons';
 
+/**
+ * Calculates a safe partition size based on model context window and budgets
+ * @param params Configuration parameters
+ * @returns The recommended partition/chunk size
+ */
 const computeSafePartSize = (params: {
   inputContext: number;
   replyBudget: number;
@@ -21,6 +29,10 @@ const computeSafePartSize = (params: {
   return Math.max(100, raw);
 };
 
+/**
+ * Returns default splitting settings based on the default model preset
+ * @returns Default configuration for text splitting
+ */
 const getDefaultSettings = () => {
     const defaultPreset = MODEL_PRESETS.find(p => p.id === DEFAULT_PRESET_ID) as ModelPreset;
     return {
@@ -48,6 +60,7 @@ function App() {
   const [outputChunks, setOutputChunks] = useState<OutputChunk[]>([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<ActiveTab>('slicer');
+  const { toasts, removeToast, success: showSuccess, error: showError } = useToast();
 
   const [settings, setSettings] = useLocalStorage<SplitSettings>('splitSettings', getDefaultSettings());
   
@@ -60,6 +73,16 @@ function App() {
   useEffect(() => {
     document.documentElement.classList.toggle('dark', theme === 'dark');
   }, [theme]);
+
+  // Setup keyboard shortcuts
+  useKeyboardShortcuts({
+    splitText: () => {
+      if (inputText.trim() && !isLoading) {
+        handleSplit();
+      }
+    },
+    newSession: handleNewSession,
+  });
 
   // Load active session on mount
   useEffect(() => {
@@ -172,7 +195,8 @@ function App() {
     setActiveTemplateSettings(TEMPLATE_PRESETS[0].settings);
     setIsSidebarOpen(false);
     setActiveTab('slicer');
-  }, [setActiveSessionId, setSettings, setActiveTemplateSettings]);
+    showSuccess('New session created');
+  }, [setActiveSessionId, setSettings, setActiveTemplateSettings, showSuccess]);
 
   const handleSplit = async () => {
     setIsLoading(true);
@@ -197,8 +221,10 @@ function App() {
         setHistory(prev => [newHistoryItem, ...prev]);
         setActiveSessionId(newSessionId);
       }
+      showSuccess(`Successfully split text into ${chunks.length} chunks!`);
     } catch (error) {
       console.error("Failed to split text:", error);
+      showError('Failed to split text. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -221,6 +247,21 @@ function App() {
         handleNewSession();
     }
   }, [activeSessionId, setHistory, handleNewSession]);
+
+  const handleUpdateSession = useCallback((id: string, updates: Partial<HistoryItem>) => {
+    setHistory(prev => prev.map(item => item.id === id ? { ...item, ...updates } : item));
+    if (updates.isStarred !== undefined) {
+      showSuccess(updates.isStarred ? 'Session starred' : 'Session unstarred');
+    } else if (updates.title !== undefined) {
+      showSuccess('Session renamed');
+    }
+  }, [setHistory, showSuccess]);
+
+  const handleFileImport = useCallback((text: string) => {
+    setInputText(text);
+    setOutputChunks([]);
+    setIsSidebarOpen(false);
+  }, []);
   
   // This replaces the buggy useEffect that was previously here.
   const handleSettingsChange = (newSettings: React.SetStateAction<SplitSettings>) => {
@@ -261,6 +302,7 @@ function App() {
         onNewSession={handleNewSession}
         onLoadSession={handleLoadSession}
         onDeleteSession={handleDeleteSession}
+        onUpdateSession={handleUpdateSession}
         isOpen={isSidebarOpen}
         setIsOpen={setIsSidebarOpen}
       />
@@ -293,6 +335,7 @@ function App() {
                                 estimatedParts={estimatedParts}
                                 recommendedChunkSize={recommendedChunkSize}
                                 estimatedCost={estimatedCost}
+                                onFileImport={handleFileImport}
                             />
                         </div>
                         <div className="h-full hidden lg:block overflow-y-auto">
@@ -321,6 +364,7 @@ function App() {
             </div>
         </main>
       </div>
+      <Toast toasts={toasts} onRemove={removeToast} />
     </div>
   );
 }

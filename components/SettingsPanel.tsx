@@ -69,7 +69,7 @@ const ModelSelector: React.FC<{ selectedId: string, onSelect: (id: string) => vo
             <button
                 ref={triggerRef}
                 onClick={() => setIsOpen(!isOpen)}
-                className="w-full flex items-center justify-between bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm px-3 py-2 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full flex items-center justify-between bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm hover:shadow-md px-3 py-2 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
             >
                 <div className="flex items-center gap-2">
                     <ProviderIcon provider={selectedPreset.provider} className="w-5 h-5" />
@@ -78,7 +78,7 @@ const ModelSelector: React.FC<{ selectedId: string, onSelect: (id: string) => vo
                 <ChevronDownIcon className={`w-5 h-5 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
             </button>
             {isOpen && (
-                <div ref={popoverRef} className="absolute z-20 top-full mt-2 w-full md:w-[400px] bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-xl overflow-hidden">
+                <div ref={popoverRef} className="absolute z-20 top-full mt-2 w-full md:w-[400px] bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-2xl overflow-hidden animate-in fade-in duration-150">
                     <div className="p-2 border-b border-gray-200 dark:border-gray-700">
                         <div className="relative">
                              <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -210,7 +210,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ settings, setSettings, te
                     </div>
                     <div>
                         <label htmlFor="split-unit" className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Split Unit</label>
-                        <select id="split-unit" value={settings.unit} onChange={(e) => handleSettingChange('unit', e.target.value as SplitUnit)} className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm px-3 py-2 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <select id="split-unit" value={settings.unit} onChange={(e) => handleSettingChange('unit', e.target.value as SplitUnit)} className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm hover:shadow-md px-3 py-2 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200">
                             <option value="tokens">Tokens</option>
                             <option value="characters">Characters</option>
                             <option value="words">Words</option>
@@ -219,13 +219,13 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ settings, setSettings, te
                      <div>
                         <label htmlFor="chunk-size" className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Chunk Size</label>
                         <div className="relative">
-                            <input type="number" id="chunk-size" value={settings.size} onChange={(e) => handleSettingChange('size', parseInt(e.target.value, 10) || 0)} className={`w-full bg-white dark:bg-gray-800 border rounded-md px-3 py-2 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 ${isSizeOverridden ? 'border-red-500' : 'border-gray-300 dark:border-gray-700'}`} />
+                            <input type="number" id="chunk-size" value={settings.size} onChange={(e) => handleSettingChange('size', parseInt(e.target.value, 10) || 0)} className={`w-full bg-white dark:bg-gray-800 border rounded-lg px-3 py-2 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 ${isSizeOverridden ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 dark:border-gray-700'}`} />
                         </div>
                          {isSizeOverridden && <p className="text-xs text-red-500 mt-1">Warning: Size exceeds recommended maximum of {recommendedChunkSize}.</p>}
                     </div>
                      <div>
                         <label htmlFor="boundary" className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Boundary</label>
-                        <select id="boundary" value={settings.boundary} onChange={(e) => handleSettingChange('boundary', e.target.value as Boundary)} className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm px-3 py-2 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <select id="boundary" value={settings.boundary} onChange={(e) => handleSettingChange('boundary', e.target.value as Boundary)} className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm hover:shadow-md px-3 py-2 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200">
                             <option value="none">None</option>
                             <option value="sentence">Sentence</option>
                             <option value="paragraph">Paragraph</option>

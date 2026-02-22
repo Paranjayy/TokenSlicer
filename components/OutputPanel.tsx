@@ -4,12 +4,24 @@ import { OutputChunk, TemplateSettings } from '../types';
 import { downloadAsZip, downloadAsMarkdown } from '../utils/fileUtils';
 import { CopyIcon, CheckIcon, DownloadIcon } from './icons';
 
+/**
+ * OutputPanel Component
+ * Displays the text chunks generated from splitting the input text.
+ * Provides options to copy chunks and download results as Markdown or ZIP files.
+ */
 interface OutputPanelProps {
-    chunks: OutputChunk[];
-    templates: TemplateSettings;
-    isLoading: boolean;
+  /** Array of text chunks to display */
+  chunks: OutputChunk[];
+  /** Template settings for rendering chunk headers/footers */
+  templates: TemplateSettings;
+  /** Whether the splitting operation is in progress */
+  isLoading: boolean;
 }
 
+/**
+ * CopyButton Component
+ * A button that copies text to clipboard with visual feedback
+ */
 const CopyButton: React.FC<{ text: string }> = ({ text }) => {
     const [copied, setCopied] = useState(false);
     const handleCopy = () => {
@@ -18,8 +30,17 @@ const CopyButton: React.FC<{ text: string }> = ({ text }) => {
         setTimeout(() => setCopied(false), 2000);
     };
     return (
-        <button onClick={handleCopy} className="p-2 rounded-md text-gray-500 hover:bg-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 transition-colors">
-            {copied ? <CheckIcon className="w-5 h-5 text-green-500" /> : <CopyIcon className="w-5 h-5" />}
+        <button 
+            onClick={handleCopy} 
+            className={`p-2 rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-800 ${
+                copied 
+                    ? 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400' 
+                    : 'text-gray-500 hover:bg-gray-200 dark:text-gray-400 dark:hover:bg-gray-700'
+            }`}
+            title={copied ? 'Copied!' : 'Copy to clipboard'}
+            aria-label="Copy content"
+        >
+            {copied ? <CheckIcon className="w-5 h-5 text-green-500 dark:text-green-400" /> : <CopyIcon className="w-5 h-5" />}
         </button>
     );
 };
@@ -52,10 +73,18 @@ const OutputPanel: React.FC<OutputPanelProps> = ({ chunks, templates, isLoading 
                     <div className="flex-shrink-0 mb-4 flex justify-between items-center">
                         <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">Output Chunks ({chunks.length})</h2>
                          <div className="flex gap-2">
-                             <button onClick={() => downloadAsMarkdown(chunks, templates)} className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-700">
+                             <button 
+                                onClick={() => downloadAsMarkdown(chunks, templates)} 
+                                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm hover:shadow-md hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-900 transition-all duration-200"
+                                title="Download as Markdown"
+                            >
                                 <DownloadIcon className="w-4 h-4"/> MD
                             </button>
-                            <button onClick={() => downloadAsZip(chunks, templates)} className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-700">
+                            <button 
+                                onClick={() => downloadAsZip(chunks, templates)} 
+                                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm hover:shadow-md hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-900 transition-all duration-200"
+                                title="Download as ZIP"
+                            >
                                 <DownloadIcon className="w-4 h-4"/> ZIP
                             </button>
                         </div>
@@ -73,13 +102,13 @@ const OutputPanel: React.FC<OutputPanelProps> = ({ chunks, templates, isLoading 
                             </div>
                         )}
                         {chunks.map((chunk, index) => (
-                             <div key={index} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm">
-                                <div className="p-3 flex justify-between items-center border-b border-gray-200 dark:border-gray-700">
+                             <div key={index} className="chunk-item bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm hover:shadow-md transition-all duration-200">
+                                <div className="p-3 flex justify-between items-center border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/30">
                                     <h4 className="font-mono text-sm font-semibold text-gray-700 dark:text-gray-300">{chunk.name}</h4>
                                     <CopyButton text={chunk.content} />
                                 </div>
                                 <div className="p-4 max-h-48 overflow-y-auto">
-                                    <p className="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-wrap">{chunk.content}</p>
+                                    <p className="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-wrap leading-relaxed">{chunk.content}</p>
                                 </div>
                             </div>
                         ))}

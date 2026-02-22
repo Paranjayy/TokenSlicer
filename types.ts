@@ -62,6 +62,7 @@ export interface HistoryItem {
   timestamp: number;
   inputText: string;
   outputChunks: OutputChunk[];
+  isStarred?: boolean;
 }
 
 // --- Content Extractor Types ---
