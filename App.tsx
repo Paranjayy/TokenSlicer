@@ -198,7 +198,7 @@ function App() {
     showSuccess('New session created');
   }, [setActiveSessionId, setSettings, setActiveTemplateSettings, showSuccess]);
 
-  const handleSplit = async () => {
+  const handleSplit = useCallback(async () => {
     setIsLoading(true);
     let chunks: OutputChunk[] = [];
     try {
@@ -228,7 +228,7 @@ function App() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [inputText, settings, activeSessionId, showSuccess, showError, setHistory, setActiveSessionId]);
 
   const handleLoadSession = useCallback((id: string) => {
     const sessionToLoad = history.find(item => item.id === id);
